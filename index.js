@@ -29,7 +29,14 @@ app.get('/dept',async (req,res)=>{
 app.get('/hospital/:hospital_id',async (req,res)=>{  
     const{hospital_id} = req.params;     
     //const branches=await Branch.query().select('branch_name').where('hospital_id',hospital_id);
-    const hospital=await Hospital.query().where('id',hospital_id).withGraphFetched('branches.[depts]');                        
+    const hospital=await Hospital.query().select('id','hospital_name').where('id',hospital_id).withGraphFetched('branches(branch_name).[depts(dept_name)]').modifiers({
+        branch_name(builder){
+            builder.select('id','branch_name','branch_address');
+        },
+        dept_name(builder){
+            builder.select('id','dept_name');
+        }
+    });                        
     //hospital.depts=await hospital.$relatedQuery('branches');
     //hospital.depts.branch=await depts.$relatedQuery('depts');
     res.json(hospital);
