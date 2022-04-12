@@ -34,8 +34,9 @@ app.get('/hospital/:hospital_id',async (req,res)=>{
 
 app.get('/branch/:branch_id',async (req,res)=>{  
     const{branch_id} = req.params;    
-    const branch=await Branch.query().where('id',branch_id).first();                        
-    branch.depts=await branch.$relatedQuery('depts');    
+    //const branch=await Branch.query().where('id',branch_id).first();                        
+    //branch.depts=await branch.$relatedQuery('depts');  
+    const branch=await Branch.query().where('id',branch_id).withGraphFetched('depts');                          
     res.json(branch);    
 });
 
