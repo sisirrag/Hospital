@@ -33,20 +33,10 @@ app.get('/hospital/:hospital_id',async (req,res)=>{
 });
 
 app.get('/branch/:branch_id',async (req,res)=>{  
-    const{branch_id} = req.params;  
-    arr =[];    
-    let x='';
-    //const depts=await Dept.query().select('dept_name').where('branch_id',branch_id);
-    await Branch.query().where('id',branch_id)
-    .first()
-    .then(branch =>{
-        arr.push(branch);        ;                      
-        return branch.$relatedQuery('depts');
-    })
-    .then(depts =>{arr.push(depts)})
-    .catch(error=>console.log(error.message));
-    res.json(arr)
-    
+    const{branch_id} = req.params;    
+    const branch=await Branch.query().where('id',branch_id).first();                        
+    branch.depts=await branch.$relatedQuery('depts');    
+    res.json(branch);    
 });
 
 app.post('/hospital',async (req,res)=>{
