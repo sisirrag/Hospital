@@ -34,7 +34,7 @@ app.get('/hospital/:hospital_id',async (req,res)=>{
             builder.select('id','branch_name','branch_address');
         },
         dept_name(builder){
-            builder.select('id','dept_name');
+            builder.select('id', 'dept_name');
         }
     });                        
     //hospital.depts=await hospital.$relatedQuery('branches');
@@ -48,6 +48,39 @@ app.get('/branch/:branch_id',async (req,res)=>{
     //branch.depts=await branch.$relatedQuery('depts');  
     const branch=await Branch.query().where('id',branch_id).withGraphFetched('depts');                          
     res.json(branch);    
+});
+
+app.post('/insert',async (req,res)=>{ 
+    const {hospital_name,branch_name,branch_address,dept_name} =req.body;   
+    const graph =await Hospital.query().insertGraph({
+        hospital_name:hospital_name,
+        branches:[{
+            branch_name:branch_name,
+            branch_address:branch_address,
+            depts:[{
+                dept_name:dept_name
+            }]
+        }]
+    });
+    res.send('Hospital added successfully');
+});
+
+app.post('/upsert',async (req,res)=>{ 
+    const {hospital_id,hospital_name,branch_id,branch_name,branch_address,dept_id,dept_name} =req.body;   
+    const graph =await Hospital.query().upsertGraph({
+        id:hospital_id,
+        hospital_name:hospital_name,
+        branches:[{
+            id:branch_id,
+            branch_name:branch_name,
+            branch_address:branch_address,
+            depts:[{
+                
+                dept_name:dept_name
+            }]
+        }]
+    });
+    res.send('Hospital added successfully');
 });
 
 app.post('/hospital',async (req,res)=>{
